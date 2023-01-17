@@ -36,9 +36,13 @@ function LedgerPage() {
 
   const [hexContent, setHexContent] = useState([]);
 
+  const [ledgerMetadata, setLedgerMetadata] = useState([]);
+
   const [open, setOpen] = React.useState(false);
+
+  const [ledgerMetadataOpen, setLedgerMetadataOpen] = React.useState(false);
   const fetchLedger = async () => {
-    const response = await fetch(`${BACKEND_HOST}/api/bookkeeper/ledgers/${ledger}`);
+    const response = await fetch(`${BACKEND_HOST}/api/bookkeeper/ledgers/${ledger}/entries`);
     const data = await response.json();
     setContent(data.content);
   };
@@ -48,6 +52,12 @@ function LedgerPage() {
     ${ledger}/last-entry?decodeComponent=Hex&decodeNamespace=ManagedManagedLedgerSubscription`);
     const data = await response.json();
     setHexContent(data.content);
+  };
+
+  const getLedgerMetadata = async () => {
+    const response = await fetch(`${BACKEND_HOST}/api/bookkeeper/ledgers/${ledger}/metadata`);
+    const data = await response.json();
+    setLedgerMetadata(data.content);
   };
 
   const fetchLac = async () => {
@@ -61,8 +71,12 @@ function LedgerPage() {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleLedgerMetadataOpenClose = () => {
     setOpen(false);
+  };
+
+  const handleClose = () => {
+    setLedgerMetadataOpen(false);
   };
 
   const [decodeComponent, setDecodeComponent] = React.useState('');
@@ -104,6 +118,7 @@ function LedgerPage() {
     fetchLedger();
     fetchLac();
     fetchHexLedger();
+    getLedgerMetadata();
   }, []);
 
   return (
@@ -130,6 +145,24 @@ function LedgerPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>
+            close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Button variant="contained" onClick={handleClickOpen}>
+        show ledgerMeta
+      </Button>
+      <Dialog
+        open={ledgerMetadataOpen}
+        onClose={handleLedgerMetadataOpenClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">metadata</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">{ledgerMetadata}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLedgerMetadataOpenClose} autoFocus>
             close
           </Button>
         </DialogActions>
